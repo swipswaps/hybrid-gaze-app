@@ -1,0 +1,19 @@
+groups:
+  - name: hybrid_gaze_alerts
+    rules:
+      - alert: HighRequestLatency
+        expr: http_request_duration_seconds{endpoint="/metrics"} > 0.5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High HTTP request latency on {{ $labels.instance }}"
+          description: "Latency >500ms for {{ $labels.endpoint }} (value: {{ $value }}s)."
+      - alert: BackendServiceDown
+        expr: up{job="fastapi-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "FastAPI backend is down"
+          description: "Target unreachable for >1 minute."
